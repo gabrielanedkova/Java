@@ -1,0 +1,33 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Hall;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Movie;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.MovieGenre;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Projection;
+
+public class Test {
+
+	public static void main(String[] args) {
+		Map<Movie, List<Projection>> program = new HashMap<Movie, List<Projection>>();
+		List<Projection> list = new LinkedList<Projection>();
+		Hall hall = new Hall(3, 13, 23);
+		Movie movie = new Movie("ha", 12, MovieGenre.ACTION);
+		Projection p1 = new Projection(movie, hall, LocalDateTime.now().plusDays(11));
+		Projection p2 = new Projection(movie, hall, LocalDateTime.now().plusDays(1));
+		list.add(p1);
+		list.add(p2);
+		Movie movie1 = new Movie("pisna mi", 12, MovieGenre.DRAMA);
+		Projection p3 = new Projection(movie1, hall, LocalDateTime.now().plusDays(13));
+		Projection p4 = new Projection(movie1, hall, LocalDateTime.now().plusDays(9));
+
+		program.put(movie, list);
+
+	}
+
+}

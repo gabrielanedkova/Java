@@ -1,0 +1,125 @@
+package bg.uni.sofia.fmi.mjt.cache;
+
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.naming.InitialContext;
+
+public class MemCache<K, V> implements Cache<K, V> {
+
+   private static final long INITIAL_CAPACITY = 10000;
+
+	private long capacity;
+	private HashMap<K, Entry<V, LocalDateTime>> cachedElements;
+	private double hitRate;
+	private int getsRequested;
+
+	
+	public MemCache(final long capacity) {
+		this.capacity = capacity;
+		hitRate = 0.0;
+		getsRequested = 0;
+		cachedElements = new HashMap<K, Entry<V, LocalDateTime>>();
+	}
+
+
+
+	public MemCache() {
+		this.capacity = INITIAL_CAPACITY;
+		hitRate = 0.0;
+		getsRequested = 0;
+		cachedElements = new HashMap<K, Entry<V, LocalDateTime>>();
+	}
+
+	@Override
+	public V get(K key) {
+
+		Entry<V, LocalDateTime> valueDataEntry = cachedElements.get(key);
+		if (valueDataEntry == null) {
+			updateHitRate(0);
+			return null;
+		}
+		LocalDateTime dateTime = valueDataEntry.getValue();
+		if(dateTime != null)
+		{
+			if (dateTime.isBefore(LocalDateTime.now())) {
+				cachedElements.remove(key);
+				updateHitRate(0);
+				return null;
+			}
+		}
+		updateHitRate(1);
+		return valueDataEntry.getKey();
+	}
+
+	private void updateHitRate(int i) {
+		getsRequested++;
+		hitRate += i;
+	}
+
+	@Override
+	public void set(K key, V value, LocalDateTime expiresAt) throws CapacityExceededException {
+		if (key != null && value != null) {
+			if (cachedElements.get(key) == null) {
+				if (capacity <= cachedElements.size()) {
+					if (!searchAndRemoveExpired()) {
+						throw new 
+						CapacityExceededException
+						("The cache is full!!!");
+					}
+				}
+			}
+			Map.Entry<V, LocalDateTime> valueEntry =
+			        new AbstractMap.SimpleEntry<V, LocalDateTime>(value, expiresAt);
+			cachedElements.put(key, valueEntry);
+		}
+	}
+
+	private boolean searchAndRemoveExpired() {
+		for (Iterator<Map.Entry<K, Entry<V, LocalDateTime>>> it =
+		        cachedElements.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<K, Entry<V, LocalDateTime>> entry = it.next();
+			if (entry.getValue().getValue().isBefore(LocalDateTime.now())) {
+				it.remove();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public LocalDateTime getExpiration(K key) {
+		Map.Entry<V, LocalDateTime> valueEntry = 
+		        cachedElements.get(key);
+		if (valueEntry != null) {
+			return valueEntry.getValue();
+		}
+		return null;
+	}
+
+	@Override
+	public boolean remove(K key) {
+		return cachedElements.remove(key) == null ? false : true;
+	}
+
+	@Override
+	public long size() {
+		return cachedElements.size();
+	}
+
+	@Override
+	public void clear() {
+		cachedElements.clear();
+		hitRate = 0.0;
+		getsRequested = 0;
+	}
+
+	@Override
+	public double getHitRate() {
+		return hitRate / getsRequested;
+	}
+}

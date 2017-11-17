@@ -1,0 +1,26 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.core;
+
+import java.time.LocalDateTime;
+
+public class Projection {
+	
+	private Movie movie;
+	private Hall hall;
+	private LocalDateTime dateTime;
+	public Projection(Movie movie, Hall hall, LocalDateTime date)
+	{
+		this.movie = movie;
+		this.hall = hall;
+		this.dateTime = date;
+	}
+
+	public Movie getMovie()
+	{
+		return movie;
+	}
+	
+	public LocalDateTime getDate()
+	{
+		return dateTime;
+	}
+}

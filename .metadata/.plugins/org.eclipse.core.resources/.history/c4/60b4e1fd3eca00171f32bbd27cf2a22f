@@ -1,0 +1,13 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.core;
+
+public class Seat {
+
+	private int row;
+	private int seat;
+	
+	public Seat(int row, int seat)
+	{
+		this.row = row;
+		this.seat = seat;
+	}
+}

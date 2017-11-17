@@ -1,0 +1,26 @@
+package bg.uni.sofia.fmi.mjt.dungeon.treasure;
+
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+
+public abstract class Power implements Treasure {
+
+	protected String name;
+	protected int damage;
+
+	public Power(String name, int damage) {
+		this.name = name;
+		this.damage = damage;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getDamage() {
+		return damage;
+	}
+
+	@Override
+	public abstract String collect(Hero hero);
+
+}

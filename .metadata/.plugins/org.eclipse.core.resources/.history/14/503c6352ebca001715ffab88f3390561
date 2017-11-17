@@ -1,0 +1,14 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class CinemaCityTest {
+
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

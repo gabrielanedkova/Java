@@ -1,0 +1,22 @@
+package test;
+
+import java.util.Map;
+
+import bg.uni.sofia.fmi.mjt.dungeon.GameEngine;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Position;
+import bg.uni.sofia.fmi.mjt.dungeon.treasure.Treasure;
+import bg.uni.sofia.fmi.mjt.dungeon.treasure.Weapon;
+
+public class Main {
+
+	public static void main(String[] args) {
+		char[][] map = null;
+		Enemy[] enemies = null;
+		Treasure[] treasures = null;
+		GameEngine gameEngine = new GameEngine(map, new Hero("", 1, 1, new Position(1, 3)), enemies, treasures);
+	}
+	
+
+}

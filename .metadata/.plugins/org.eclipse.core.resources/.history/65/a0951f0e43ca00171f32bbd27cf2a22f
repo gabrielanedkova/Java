@@ -1,0 +1,91 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Movie;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Projection;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Seat;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Ticket;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.AlreadyReservedException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ExpiredProjectionException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.InvalidSeatException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ProjectionNotFoundException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ReservationNotFoundException;
+
+public class CinemaCity implements CinemaReservationSystem{
+
+	Map<Movie, List<Projection>> cinemaProgram;
+	HashSet<Ticket> reservedTickets;
+	
+	public CinemaCity(Map<Movie, List<Projection>> cinemaProgram) {
+		this.cinemaProgram = cinemaProgram;
+	}
+
+	@Override
+	public void bookTicket(Ticket ticket) throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		if (reservedTickets.contains(ticket))
+		{
+			throw new AlreadyReservedException("This ticket is already reserved!");
+		}
+		Projection ticketProjection = ticket.getProjection();
+		Movie ticketMovie = ticketProjection.getMovie();
+		Seat seat = ticket.getSeat();
+		if (!cinemaProgram.containsKey(ticketMovie))
+		{
+			throw new ProjectionNotFoundException("Movie doesnt exist!");
+		}
+		List<Projection> projections = cinemaProgram.get(ticketMovie);
+		if(!projections.contains(ticketProjection))
+		{
+			throw new ProjectionNotFoundException("Projection doesnt exist!");
+		}
+		if (ticketProjection.getDate().isBefore(LocalDateTime.now()))
+		{
+			throw new ExpiredProjectionException("The projection is expired!");
+		}
+		if(!ticketProjection.hasSeat(seat))
+		{
+			throw new InvalidSeatException("The seat doest exist!");
+		}
+		reservedTickets.add(ticket);
+		ticketProjection.takeSeat();
+	}
+
+	@Override
+	public void cancelTicket(Ticket ticket) throws ReservationNotFoundException, ProjectionNotFoundException {
+		Projection ticketProjection = ticket.getProjection();
+		List<Projection> movieProjections = cinemaProgram.get(ticketProjection.getMovie());
+		if (!movieProjections.contains(ticketProjection))
+		{
+			throw new ProjectionNotFoundException("The projection doesnt exist!");
+		}
+		if(!reservedTickets.contains(ticket))
+		{
+			throw new ReservationNotFoundException("Reservation not found!");
+		}
+		ticketProjection.freeSeat();
+		reservedTickets.remove(ticket);
+		
+	}
+
+	@Override
+	public int getFreeSeats(Projection projection) throws ProjectionNotFoundException {
+		List<Projection> movieProjections = cinemaProgram.get(projection.getMovie());
+		if (!movieProjections.contains(projection))
+		{
+			throw new ProjectionNotFoundException("The projection doesnt exist!");
+		}
+		return projection.getFreeSeatsNumber();
+	}
+
+	@Override
+	public Collection<Movie> getSortedMoviesByGenre() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

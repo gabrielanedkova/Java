@@ -1,0 +1,45 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Movie;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Projection;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Ticket;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.AlreadyReservedException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ExpiredProjectionException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.InvalidSeatException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ProjectionNotFoundException;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions.ReservationNotFoundException;
+
+public class CinemaCity implements CinemaReservationSystem{
+
+	public CinemaCity(Map<Movie, List<Projection>> cinemaProgram) {
+	}
+
+	@Override
+	public void bookTicket(Ticket ticket) throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cancelTicket(Ticket ticket) throws ReservationNotFoundException, ProjectionNotFoundException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getFreeSeats(Projection projection) throws ProjectionNotFoundException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Collection<Movie> getSortedMoviesByGenre() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

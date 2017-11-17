@@ -1,0 +1,190 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions;
+
+import static org.junit.Assert.*;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import javax.sql.RowSet;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.CinemaCity;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Hall;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Movie;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.MovieGenre;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Projection;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Seat;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Ticket;
+
+public class CinemaCityTest {
+
+	private CinemaCity cinema;
+
+	@Before
+	public void setUp() {
+		Map<Movie, List<Projection>> program = new HashMap<Movie, List<Projection>>();
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Movie movie2 = new Movie("Star Wars: The Last Jedi", 150, MovieGenre.ACTION);
+		Movie movie3 = new Movie("Happy Death Day", 96, MovieGenre.THRILLER);
+		Movie movie4 = new Movie("Good Time", 101, MovieGenre.DRAMA);
+		List<Projection> movie1Projection = new ArrayList<Projection>();
+		Hall hall = new Hall(1, 10, 10);
+		movie1Projection.add(new Projection(movie1, hall, LocalDateTime.of(2017, Month.JULY, 29, 19, 30, 40)));
+		movie1Projection.add(new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 19, 30, 40)));
+		movie1Projection.add(new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40)));
+		List<Projection> movie2Projection = new ArrayList<Projection>();
+		movie2Projection.add(new Projection(movie2, hall, LocalDateTime.of(2018, Month.SEPTEMBER, 29, 22, 30, 40)));
+		movie2Projection.add(new Projection(movie2, hall, LocalDateTime.of(2018, Month.SEPTEMBER, 29, 19, 30, 40)));
+		program.put(movie1, movie1Projection);
+		program.put(movie2, movie2Projection);
+		program.put(movie3, null);
+		program.put(movie4, null);
+		cinema = new CinemaCity(program);
+
+	}
+
+	@Test
+	public void bookTicketTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException,
+			ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		cinema.bookTicket(ticket);
+		assertTrue(cinema.isReserved(ticket));
+	}
+
+	@Test
+	public void bookAlreadyReservedTicketTest() throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		cinema.bookTicket(ticket);
+		try {
+			cinema.bookTicket(ticket);
+		} catch (AlreadyReservedException e) {
+			assertEquals("This ticket is already reserved!", e.getMessage());
+		}
+	}
+
+	@Test
+	public void bookTicketForUnexistingProjectionTest() throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Movie movie2 = new Movie("FMI", 150, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection1 = new Projection(movie1, hall, LocalDateTime.of(2019, Month.JULY, 29, 22, 30, 40));
+		Projection projection2 = new Projection(movie2, hall, LocalDateTime.of(2019, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket1 = new Ticket(projection1, seat, "Ivan");
+		Ticket ticket2 = new Ticket(projection2, seat, "Ivan");
+		try {
+			cinema.bookTicket(ticket1);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("Projection doesnt exist!", e.getMessage());
+		}
+		try {
+			cinema.bookTicket(ticket2);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("Projection doesnt exist!", e.getMessage());
+		}
+	}
+
+	@Test
+	public void bookTicketForExpiredProjectionTest() throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		Movie movie = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie, hall, LocalDateTime.of(2017, Month.JULY, 29, 19, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		try {
+			cinema.bookTicket(ticket);
+		} catch (ExpiredProjectionException e) {
+			assertEquals("The projection is expired!", e.getMessage());
+		}
+	}
+
+	@Test
+	public void bookTicketInvalidSeatProjectionTest() throws AlreadyReservedException, ProjectionNotFoundException,
+			InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 19, 30, 40));
+		Seat seat = new Seat(3, 11);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		try {
+			cinema.bookTicket(ticket);
+		} catch (InvalidSeatException e) {
+			assertEquals("The seat doest exist!", e.getMessage());
+		}
+	}
+
+	@Test
+	public void cancelTicketTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException,
+			ExpiredProjectionException, ReservationNotFoundException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection1 = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Projection projection2 = new Projection(movie1, hall, LocalDateTime.of(2020, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket1 = new Ticket(projection1, seat, "Ivan");
+		Ticket ticket2 = new Ticket(projection2, seat, "Ivan");
+		cinema.bookTicket(ticket1);
+		cinema.cancelTicket(ticket1);
+		assertFalse(cinema.isReserved(ticket1));
+		try {
+			cinema.cancelTicket(ticket1);
+
+		} catch (ReservationNotFoundException e) {
+			assertEquals("Reservation not found!", e.getMessage());
+		}
+
+		try {
+			cinema.cancelTicket(ticket2);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("The projection doesnt exist!", e.getMessage());
+
+		}
+	}
+
+	@Test
+	public void getFreeSeatsTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException,
+			ExpiredProjectionException {
+		Movie movie = new Movie("It", 135, MovieGenre.HORROR);
+		final int hallRows = 10;
+		final int hallSeats = 10;
+		Hall hall = new Hall(1, hallRows, hallSeats);
+		Projection projection1 = new Projection(movie, hall, LocalDateTime.of(2020, Month.JULY, 29, 22, 30, 40));
+		try {
+			cinema.getFreeSeats(projection1);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("The projection doesnt exist!", e.getMessage());
+		}
+		Projection projection2 = new Projection(movie, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Ticket ticket = new Ticket(projection2, new Seat(3, 3), "Ivan");
+		cinema.bookTicket(ticket);
+		assertEquals(hallRows * hallRows - 1, cinema.getFreeSeats(projection2));
+
+	}
+
+	@Test
+	public void getSortedMoviesByGenreTest() {
+
+		TreeSet<Movie> sortedMovies = (TreeSet<Movie>) cinema.getSortedMoviesByGenre();
+
+	}
+
+}

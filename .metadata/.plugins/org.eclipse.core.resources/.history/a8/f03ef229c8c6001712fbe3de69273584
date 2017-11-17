@@ -1,0 +1,14 @@
+package test;
+
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Position;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Position position = new Position(-3, 4);
+		Hero hero = new Hero("as", 12, 13, position);
+		
+	}
+
+}

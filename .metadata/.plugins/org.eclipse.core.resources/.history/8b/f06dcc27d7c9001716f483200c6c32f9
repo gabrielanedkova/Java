@@ -1,0 +1,47 @@
+package bg.uni.sofia.fmi.mjt.cache;
+
+import static org.junit.Assert.*;
+
+import java.time.LocalDateTime;
+
+import org.junit.Test;
+
+public class MemCacheTest {
+
+    @Test(expected = CapacityExceededException.class)
+    public void addElementWhenCacheIsFull() throws CapacityExceededException {
+        MemCache<Integer, String> test = new  MemCache<Integer, String>(0);
+        test.set(1, "test", null);
+    }
+    
+    @Test
+    public void addsAndremovesCache() throws CapacityExceededException
+    {
+        MemCache<Integer, String> test = new  MemCache<Integer, String>(0);
+        int key = 12;
+        test.set(key, "test", null);
+        test.remove(key);
+        assertNull(test.get(key));
+
+    }
+    
+    @Test
+    public void updatesExistingCahce() throws CapacityExceededException
+    {
+        MemCache<Integer, String> test = new  MemCache<Integer, String>();
+        int key = 12;
+        test.set(key, "test", null);
+        String expectedOUtput = "updatedTest";
+        test.set(key, "text", null);
+        assertEquals(test.get(key),expectedOUtput);
+
+    }
+    @Test
+    public void getShouldReturnNullWhenCalledWithExpiredElement() throws CapacityExceededException {
+        MemCache<Integer, String> test = new  MemCache<Integer, String>();
+        test.set(1, "test",LocalDateTime.now());
+        System.out.println(test.get(1));
+        assertNull(test.get(1));
+
+    }
+}

@@ -1,0 +1,9 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.core;
+
+public class Projection {
+	public Projection(Movie movie, Hall hall, LocalDateTime date)
+	{
+		
+	}
+
+}

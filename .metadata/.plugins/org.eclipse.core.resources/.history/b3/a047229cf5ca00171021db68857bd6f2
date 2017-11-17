@@ -1,0 +1,91 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.exceptions;
+
+import static org.junit.Assert.*;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.CinemaCity;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Hall;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Movie;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.MovieGenre;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Projection;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Seat;
+import bg.uni.sofia.fmi.mjt.cinema.reservation.system.core.Ticket;
+
+public class CinemaCityTest {
+
+	private CinemaCity cinema;
+	
+	  @Before
+	    public void setUp() {
+		  Map<Movie, List<Projection>> program = new HashMap<Movie, List<Projection>>();
+		  Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		  Movie movie2 = new Movie("Star Wars: The Last Jedi", 150, MovieGenre.ACTION);
+		  List<Projection> movie1Projection = new ArrayList<Projection>();
+		  Hall hall = new Hall(1, 10, 10);
+		  movie1Projection.add(new Projection(movie1, hall,  LocalDateTime.of(2018, Month.JULY, 29, 19, 30, 40)));
+		  movie1Projection.add(new Projection(movie1, hall,  LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40)));
+		  List<Projection> movie2Projection = new ArrayList<Projection>();
+		  movie2Projection.add(new Projection(movie2, hall, LocalDateTime.of(2018, Month.SEPTEMBER, 29, 22, 30, 40)));
+		  movie2Projection.add(new Projection(movie2, hall, LocalDateTime.of(2018, Month.SEPTEMBER, 29, 19, 30, 40)));
+		  program.put(movie1, movie1Projection);
+		  program.put(movie2, movie2Projection);
+	      cinema = new CinemaCity(program);
+	     
+	    }
+
+	@Test
+	public void bookTicketTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		cinema.bookTicket(ticket);
+		assertTrue(cinema.isReserved(ticket));
+	}
+
+	@Test
+	public void bookAlreadyReservedTicketTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection = new Projection(movie1, hall, LocalDateTime.of(2018, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket = new Ticket(projection, seat, "Ivan");
+		cinema.bookTicket(ticket);
+		try {
+			cinema.bookTicket(ticket);
+		} catch (AlreadyReservedException e) {
+			assertEquals("This ticket is already reserved!", e.getMessage());
+		}	
+	}
+	@Test
+	public void bookTicketForUnexistingProjectionTest() throws AlreadyReservedException, ProjectionNotFoundException, InvalidSeatException, ExpiredProjectionException {
+		Movie movie1 = new Movie("It", 135, MovieGenre.HORROR);
+		Movie movie2 = new Movie("FMI", 150, MovieGenre.HORROR);
+		Hall hall = new Hall(1, 10, 10);
+		Projection projection1 = new Projection(movie1, hall, LocalDateTime.of(2019, Month.JULY, 29, 22, 30, 40));
+		Projection projection2 = new Projection(movie2, hall, LocalDateTime.of(2019, Month.JULY, 29, 22, 30, 40));
+		Seat seat = new Seat(3, 4);
+		Ticket ticket1 = new Ticket(projection1, seat, "Ivan");
+		Ticket ticket2 = new Ticket(projection2, seat, "Ivan");
+		try {
+			cinema.bookTicket(ticket1);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("Projection doesnt exist!", e.getMessage());
+		}
+		try {
+			cinema.bookTicket(ticket2);
+		} catch (ProjectionNotFoundException e) {
+			assertEquals("Projection doesnt exist!", e.getMessage());
+		}
+	}
+}

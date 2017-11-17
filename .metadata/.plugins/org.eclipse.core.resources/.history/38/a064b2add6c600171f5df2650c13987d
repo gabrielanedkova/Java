@@ -1,0 +1,86 @@
+package bg.uni.sofia.fmi.mjt.dungeon;
+
+import javax.lang.model.type.PrimitiveType;
+import javax.naming.InsufficientResourcesException;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Position;
+import bg.uni.sofia.fmi.mjt.dungeon.treasure.Treasure;
+
+public class GameEngine {
+
+	private char[][] map;
+	private Hero hero;
+	private Enemy[] enemies;
+	private Treasure[] treasures;
+	public GameEngine(char[][] map, Hero hero, Enemy[] enemies, Treasure[] treasures)
+	{
+		this.map = map;
+		this.hero = hero;
+		this.enemies = enemies;
+		this.treasures = treasures;
+	}
+	
+	public char[][] getMap()
+	{
+		return map;
+	}
+	
+	public String makeMove(int command)	
+	{
+		Position newPosition = getNewPosition(command);
+		if(newPosition.equals(hero.getPosition()))
+		{
+			return "Unknown command entered.";
+		}
+		if()
+		
+	}
+	
+	private boolean isOutOfBounds(Position position)
+	{
+		return (position.getCol() <= map.length && position.getRow() <= map[0].length);
+	}
+	private Position getNewPosition(int command)
+	{
+		Position newPosition = hero.getPosition();
+		int col = hero.getPosition().getCol();
+		int row = hero.getPosition().getRow();
+		switch(command)
+		{
+			case 0: 
+				newPosition = new Position(--col, row);
+			case 1:	
+				newPosition = new Position(col, --row);
+			case 2:	
+				newPosition = new Position(++col, row);
+			case 3:	
+				newPosition = new Position(col, ++row);
+		}
+		return newPosition;
+	}
+	
+	private boolean moveLeft()
+	{
+		Position position = hero.getPosition();
+		position.incrementCol();
+		char newPosition = map[position.getCol()][position.getRow()];
+		
+		switch(newPosition)
+		{
+		case '.':
+			hero.moveLeft();
+			map[position.getCol()][position.getRow()] = 'H';
+			map[position.getCol()-1][position.getRow()] = '.';
+			System.out.println("You moved successfully to the next position");
+			
+		}
+	}
+	
+	private bool isFree(Position position)
+	{
+		if ()
+	}
+}

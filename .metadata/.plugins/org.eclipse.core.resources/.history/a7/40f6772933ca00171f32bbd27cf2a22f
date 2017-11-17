@@ -1,0 +1,15 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.core;
+
+public class Movie {
+
+	private String name;
+	private int duration;
+	private MovieGenre genre;
+	
+	public Movie(String name, int duration, MovieGenre genre)
+	{
+		this.name = name;
+		this.duration = duration;
+		this.genre = genre;	
+	}
+}

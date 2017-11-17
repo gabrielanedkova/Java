@@ -1,0 +1,16 @@
+package test;
+
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Position;
+import bg.uni.sofia.fmi.mjt.dungeon.treasure.Weapon;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Weapon weapon = null;
+		if (weapon != null)
+			System.out.println("DFASDF");
+
+	}
+
+}

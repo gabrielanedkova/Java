@@ -1,0 +1,17 @@
+package bg.uni.sofia.fmi.mjt.cinema.reservation.system.core;
+
+import java.util.Comparator;
+
+public enum MovieGenre {
+
+	ACTION, ADVENTURE, COMEDY, FANTASY, HORROR, THRILLER, DRAMA;
+
+}
+
+class MovieGenreComparator implements Comparator<MovieGenre> {
+
+	@Override
+	public int compare(final MovieGenre arg0, final MovieGenre arg1) {
+		return arg0.toString().compareTo(arg1.toString());
+	}
+}

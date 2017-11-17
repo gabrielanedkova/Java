@@ -1,0 +1,101 @@
+package bg.uni.sofia.fmi.mjt.dungeon;
+
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
+import bg.uni.sofia.fmi.mjt.dungeon.actor.Position;
+import bg.uni.sofia.fmi.mjt.dungeon.treasure.Treasure;
+
+public class GameEngine {
+
+	private char[][] map;
+	private Hero hero;
+	private Enemy[] enemies;
+	private Treasure[] treasures;
+	private int enemiedUsed;
+	private int treasuresUsed;
+
+	public GameEngine(char[][] map, Hero hero, Enemy[] enemies, Treasure[] treasures) {
+		this.map = map;
+		this.hero = hero;
+		this.enemies = enemies;
+		this.treasures = treasures;
+		enemiedUsed = 0;
+		treasuresUsed = 0;
+	}
+
+
+	public char[][] getMap() {
+		return map;
+	}
+
+	public String makeMove(int command) {
+		String message = null;
+		Position newPosition = getNewPosition(command);
+		if (newPosition.equals(hero.getPosition())) {
+			message = "Unknown command entered.";
+			return message;
+		}
+		if (!isOutOfBounds(newPosition)) {
+			char posSign = map[newPosition.getRow()][newPosition.getCol()];
+			switch (posSign) {
+			case '.':
+				changePosition(newPosition);
+				hero.changePosition(newPosition);
+				message = "You moved successfully to the next position";
+				break;
+			case '#':
+				message = "Wrong move. There is an obstacle and you cannot bypass it.";
+				break;
+			case 'T':
+				changePosition(newPosition);
+				hero.changePosition(newPosition);
+				if(treasures.length < treasuresUsed)
+					message = hero.takeTreasure(treasures[treasuresUsed++]);
+				break;
+			case 'E':
+				message = hero.fightEnemy(enemies[enemiedUsed]);
+				if (hero.isAlive()) {
+					changePosition(newPosition);
+					hero.changePosition(newPosition);
+				}
+				break;
+			case 'G':
+				message = "You have successfully passed through the dungeon. Congrats!";
+				break;
+			}
+		}
+		return message;
+
+	}
+
+	private void changePosition(Position newPosition) {
+		map[newPosition.getRow()][newPosition.getCol()] = 'H';
+		map[hero.getPosition().getRow()][hero.getPosition().getCol()] = '.';
+	}
+
+	private boolean isOutOfBounds(Position position) {
+		return (position.getRow() <= map.length && position.getCol() <= map[0].length);
+	}
+
+	private Position getNewPosition(int command) {
+		Position newPosition = hero.getPosition();
+		int col = hero.getPosition().getCol();
+		int row = hero.getPosition().getRow();
+		switch (command) {
+		case 0:
+			newPosition = new Position(--col, row);
+			break;
+		case 1:
+			newPosition = new Position(col, --row);
+			break;
+		case 2:
+			newPosition = new Position(++col, row);
+			break;
+		case 3:
+			newPosition = new Position(col, ++row);
+			break;
+		}
+		return newPosition;
+	}
+
+}
